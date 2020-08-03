@@ -20,17 +20,31 @@ app.post('/api/login', async (req, res) => {
     const resp = await User.findOne({email, password})
 
     if(!resp){
-        console.log('Incorrect details')
-        //user login is incorrect 
+        res.json({
+            success: false,
+            message: "Incorrect details"
+        }) 
     }else{
         console.log('Logging you in')
-        //make a session and set user to logged in
+        res.json({
+            success: true
+        }) 
     }
-    res.send('k')
 })
 
 app.post('/api/register', async (req, res) => {
     const {email, password} = req.body
+
+    const existingUser = await User.findOne({email})
+
+    if(existingUser){
+        res.json({
+            success: false,
+            message: "Email already in use"
+        })
+        return
+    }
+
     const user = new User({
         email,
         password
@@ -39,7 +53,10 @@ app.post('/api/register', async (req, res) => {
     const result = await user.save()
     console.log(result)
 
-    res.json(result)
+    res.json({
+        success: true,
+        message: "Welcome! User created"
+    })
 })
 
 app.listen(1234, () => {
