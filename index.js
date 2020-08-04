@@ -19,6 +19,23 @@ const User = require('./models/users')
 
 app.use(bodyParser.json())
 
+app.post('/api/quote', async (req, res) => {
+    console.log(req.session.user, req.body.value)
+    const user = await User.findOne({email: req.session.user})
+    if(!user){
+        res.json({
+            success: false,
+            message: 'Invalid User'
+        })
+        return
+    }
+
+    await User.update({email:req.session.user}, {$set: {quote:req.body.value}})
+    res.json({
+        success: true
+    })
+})
+
 app.post('/api/login', async (req, res) => {
     const {email, password} = req.body
 
